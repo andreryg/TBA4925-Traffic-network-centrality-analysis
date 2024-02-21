@@ -1,5 +1,8 @@
-veg.xlsx
-veg.csv
+*.csv
+*.xlsx
+*.gfs
+*.gml
+*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

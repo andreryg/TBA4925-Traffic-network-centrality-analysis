@@ -5,7 +5,7 @@ from shapely import wkt
 
 def download_road_data():
     v = nvdbapiv3.nvdbVegnett()
-    v.filter({'vegsystemreferanse' : ['E', 'R']})
+    v.filter({'vegsystemreferanse' : ['EV', 'RV']})
     road_dataframe = pd.DataFrame(v.to_records())
 
     typeveg_mask = ((road_dataframe['typeVeg'] == 'Gågate') | (road_dataframe['typeVeg'] == 'Gang- og sykkelveg') | (road_dataframe['typeVeg'] == 'Sykkelveg') | (road_dataframe['typeVeg'] == 'Fortau') | (road_dataframe['typeVeg'] == 'Gangfelt') | (road_dataframe['typeVeg'] == 'Trapp'))
