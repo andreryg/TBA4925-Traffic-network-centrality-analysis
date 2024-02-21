@@ -21,6 +21,16 @@ def wkt_loads(x):
 def centroid(polygon):
     return polygon.centroid
 
+def speedlimit_grouping(speedlimit_dataframe):
+    agg_functions = {
+        'time': sum,
+    }
+    speedlimit_dataframe['road'] = speedlimit_dataframe['vref'].apply(lambda x: x.split("D")[0])
+    speedlimit_dataframe['time'] = speedlimit_dataframe.apply(lambda x: (float(x.segmentlengde)/1000)/float(x.Fartsgrense), axis=1)
+    speedlimit_dataframe = speedlimit_dataframe[['road', 'time']].groupby('road').agg(agg_functions).reset_index()
+
+    return speedlimit_dataframe
+
 def road_grouping(road_dataframe):
     agg_functions = {
         'geometry': '- '.join,
@@ -47,6 +57,9 @@ def road_grouping(road_dataframe):
     return road_dataframe
 
 def main():
+    speedlimit_dataframe = read_csv_to_dataframe("speedlimit.csv")
+    speedlimit_dataframe = speedlimit_grouping(speedlimit_dataframe)
+    
     road_dataframe = read_csv_to_dataframe("veg.csv")
     road_dataframe = road_grouping(road_dataframe)
 
