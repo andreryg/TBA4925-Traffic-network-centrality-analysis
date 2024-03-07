@@ -128,7 +128,7 @@ def create_color_map(G, colors):
     return color_map, color_dict, labels
 
 def calculate_centrality(G):
-    bc = nx.betweenness_centrality(G)
+    bc = nx.betweenness_centrality(G, weight='weight')
     nx.set_node_attributes(G, bc, "cent_betweenness")
     return G, bc
 
@@ -190,6 +190,7 @@ def main():
             adjacents[i] = adjacents.get(i.split("x")[0])
         else:
             print(i)
+    road_d_gdf = road_gdf.copy()
     road_gdf = pd.concat([road_gdf, road_x_gdf], ignore_index=True)
     road_gdf['pos'] = road_gdf.apply(lambda x: (x.x,x.y),axis=1)
     pos = dict(zip(road_gdf.road,road_gdf.pos))
@@ -198,21 +199,27 @@ def main():
     
     nx.set_node_attributes(G, road_gdf[['road','x','y','color']].set_index('road').to_dict('index'))
     for pair in list(G.edges):
-        G.edges[pair[0],pair[1]]["weight"] = round((2 - road_gdf[road_gdf['road'] == pair[1]]['time'])*100)
+        G.edges[pair[0],pair[1]]["weight"] = round((1/(road_gdf[road_gdf['road'] == pair[1]]['time']))*100).values
     G.remove_edges_from(nx.selfloop_edges(G))
     
-    print(list(G.neighbors("EV6 S3_Fredrikstad/Sarpsborgx1")))
+    
     G, bc = calculate_centrality(G)
     with open('centralityDict.txt', 'w') as fp:
         json.dump(bc, fp)
 
+    G = G.subgraph([x for x,y in G.nodes(data=True) if "x" not in x])
     colors = ['#377eb8', '#feb24c', '#e41a1c']
     color_map, color_dict, labels = create_color_map(G, colors)
 
 
-    fig, ax = plt.subplots()
+    """fig, ax = plt.subplots()
     nx.draw(G,pos=pos,node_color=color_map,ax=ax)#[nx.get_node_attributes(G,'color')[node] for node in G.nodes()],ax=ax)
     ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
+    plt.show()"""
+
+    #road_d_gdf['color'] = color_map
+    road_d_gdf['color'] = road_d_gdf.road.map(color_dict)
+    road_d_gdf.plot(color=road_d_gdf['color'])
     plt.show()
 
     
