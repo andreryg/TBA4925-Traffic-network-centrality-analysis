@@ -5,6 +5,8 @@
 *.txt
 test.py
 *.png
+articles/
+city_data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
