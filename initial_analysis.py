@@ -187,7 +187,10 @@ def main():
 
     for i in road_x_gdf['road'].values.tolist():
         if i.split("x")[0] in adjacents:
-            adjacents[i] = adjacents.get(i.split("x")[0])
+            adjacents[i] = [i.split("x")[0]]
+            tmp = adjacents.get(i.split("x")[0])
+            tmp += [i]
+            adjacents[i.split("x")[0]] = tmp
         else:
             print(i)
     road_d_gdf = road_gdf.copy()
