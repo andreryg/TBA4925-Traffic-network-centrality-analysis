@@ -8,6 +8,7 @@ from graph import CityNode, TransportNode
 import pickle
 import json
 import networkx as nx
+from tqdm import tqdm
 
 def read_excel_to_dataframe(file):
     return pd.read_excel(file)
@@ -41,6 +42,8 @@ def road_grouping(road_dataframe):
         'sluttnode': ', '.join
     }
     road_dataframe['road'] = road_dataframe['vref'].apply(lambda x: x.split("D")[0])
+    road_dataframe['startnode'] = road_dataframe['startnode'].apply(lambda x: str(x))
+    road_dataframe['sluttnode'] = road_dataframe['sluttnode'].apply(lambda x: str(x))
     road_dataframe = road_dataframe[['road','startnode','sluttnode','geometry']].groupby('road').agg(agg_functions).reset_index()
     #print(road_dataframe.shape)
 
@@ -65,7 +68,7 @@ def create_adjacency_list(road_dataframe):
     """
     adjacency_list = {}
 
-    for ind in road_dataframe.index:
+    for ind in tqdm(road_dataframe.index):
         adjacents = []
         for node in road_dataframe['noder'][ind]:
             adj_noder = road_dataframe.loc[road_dataframe['noder'].apply(lambda x: node in x)]
