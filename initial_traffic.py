@@ -352,13 +352,13 @@ def main():
     traffic_df = traffic_aggregate(traffic_df)
 
     #Centrality
-    """with open('centralityDict.txt', 'r') as fp: 
+    with open('centralityDict.txt', 'r') as fp: 
         bc = json.load(fp)
     
     bc_list = [(key, value) for key, value in bc.items()]
     bc_df =  pd.DataFrame(bc_list, columns=['road', 'bc'])
 
-    merged_df = pd.merge(traffic_df[['road', 'average_ådt']],bc_df, on='road',how='inner')"""
+    merged_df = pd.merge(traffic_df[['road', 'average_ådt']],bc_df, on='road',how='inner')
     
     #Feltoversikt
     """feltoversikt_df = pd.read_excel("feltoversikt-mainroads.xlsx") 
@@ -479,16 +479,16 @@ def main():
     merged_df['tunnelgrad'] = merged_df.apply(lambda x: x.number_of_tunnel / x.segmentlengde,axis=1)"""
 
     #Skjerm
-    skjerm_df = pd.read_excel("skjerm-mainroads.xlsx")
+    """skjerm_df = pd.read_excel("skjerm-mainroads.xlsx")
     skjerm_df = skjerm_aggregate(skjerm_df)
 
     merged_df = pd.merge(traffic_df[['road', 'average_ådt','segmentlengde']], skjerm_df[['road', 'lengde']], on='road',how='inner')
     merged_df['segmentlengde'] = merged_df['segmentlengde'].apply(lambda x: sum(x))
-    merged_df['fylningsgrad'] = merged_df.apply(lambda x: x.lengde / x.segmentlengde,axis=1)
+    merged_df['fylningsgrad'] = merged_df.apply(lambda x: x.lengde / x.segmentlengde,axis=1)"""
 
-    merged_df.plot.scatter(x='average_ådt', y='fylningsgrad', color='blue')
+    merged_df.plot.scatter(x='average_ådt', y='bc', color='blue')
     plt.show()
-    corr = merged_df['average_ådt'].corr(merged_df['fylningsgrad'])
+    corr = merged_df['average_ådt'].corr(merged_df['bc'])
     print(corr)
 
     """ådt = pd.Series(sorted([x for x in merged_df['average_ådt'].values.tolist() if not math.isnan(x)]))

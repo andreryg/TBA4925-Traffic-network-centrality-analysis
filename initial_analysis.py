@@ -80,7 +80,7 @@ def create_adjacency_list(road_dataframe):
     return adjacency_list
 
 def pop_function(x):
-    return math.sqrt(x)/5
+    return math.log10(x)**3.5 #math.sqrt(x)/5
 
 def create_color_map(G, colors):
     color_map = []
