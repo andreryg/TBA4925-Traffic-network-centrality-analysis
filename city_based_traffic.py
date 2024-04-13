@@ -5,7 +5,8 @@ import pandas as pd
 import geopandas as gpd
 import json
 import matplotlib.pyplot as plt
-from scipy.stats.stats import pearsonr
+from scipy.stats import pearsonr
+import shapely
 
 def main():
     tettsteder = read_csv_to_dataframe("alle_tettsteder.csv")
@@ -33,6 +34,7 @@ def main():
         values.append(wkt_loads(row.geometry).area)
         values.append(values[1]/values[2])
         values.append(bc_df.shape[0])
+        values.append(str(shapely.centroid(wkt_loads(row.geometry))))
 
         cityDict[row.tettstednavn.replace('/','&')] = values #tettstednavn: [korrelasjon,befolkning,areal,tetthet,ant.veglenker]
     with open(f"city_data/cityDict.txt", 'w') as fp:
@@ -44,26 +46,24 @@ def main():
 def city_analysis():
     with open(f"city_data/cityDict.txt", 'r') as fp:
         cityDict = json.load(fp)
-    names = []
-    corr = []
-    pop = []
-    area = []
-    den = []
-    seg = []
+    cities = []
 
     for key, val in cityDict.items():
-        names.append(key)
-        corr.append(val[0])
-        pop.append(val[1])
-        area.append(val[2])
-        den.append(val[3])
-        seg.append(val[4])
+        cities.append([key, val[0], val[1], val[2], val[3], val[4], val[5]])
     
-    plt.scatter(corr, seg)
+    cities = pd.DataFrame(cities,columns=['Names', 'Correlation', 'Population', 'Area', 'Density', 'Segments', 'Centroid'])
+    cities['Centroid'] = cities['Centroid'].apply(lambda x: wkt_loads(x))
+    citiesGDF = gpd.GeoDataFrame(cities, geometry='Centroid', crs=5973)
+    colors = ['#edf8fb', '#b3cde3', '#8c96c6', '#8856a7', '#252525']
+    citiesGDF['color'] = citiesGDF['Correlation'].apply(lambda x: colors[0] if x<0 else colors[1] if x<0.25 else colors[2] if x<0.50 else colors[3] if x<0.75 else colors[4])
+    citiesGDF.plot(color=citiesGDF['color'])
+    plt.show()
+
+    """plt.scatter(cities['Correlation'], cities['Segments'])
     plt.xlabel("Correlation")
     plt.ylabel("No of roads")
-    print(pearsonr(corr,seg))
-    plt.show()
+    print(pearsonr(cities['Correlation'],cities['Segments']))
+    plt.show()"""
 
 if __name__ == "__main__":
     #main()
