@@ -141,7 +141,7 @@ def traffic_aggregate(df):
         'ÅDT, total': lambda col: col.tolist(),
         'segmentlengde': lambda cal: cal.tolist()
     }
-    df['road'] = df['vref'].apply(lambda x: x.split("D")[0])
+    df['road'] = df['vref'].apply(lambda x: x.split(" m")[0])
     df = df[['road','ÅDT, total','segmentlengde']].groupby('road').agg(agg_functions).reset_index()
 
     df = df.rename(columns={'ÅDT, total': 'ådt'})

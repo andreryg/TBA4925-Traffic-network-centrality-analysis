@@ -20,8 +20,7 @@ def convex_hull(string):
     multipnt = MultiPoint(d2_lst)
     hull = multipnt.convex_hull.wkt
 
-    """plt.plot(*wkt.loads(hull).exterior.xy)
-    plt.show()"""
+    """ """
 
     return hull
 

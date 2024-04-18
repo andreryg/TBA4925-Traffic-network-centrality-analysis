@@ -29,7 +29,7 @@ def speedlimit_grouping(speedlimit_dataframe):
     agg_functions = {
         'time': sum,
     }
-    speedlimit_dataframe['road'] = speedlimit_dataframe['vref'].apply(lambda x: x.split("D")[0])
+    speedlimit_dataframe['road'] = speedlimit_dataframe['vref'].apply(lambda x: x.split(" m")[0])
     speedlimit_dataframe['time'] = speedlimit_dataframe.apply(lambda x: (float(x.segmentlengde)/1000)/float(x.Fartsgrense), axis=1)
     speedlimit_dataframe = speedlimit_dataframe[['road', 'time']].groupby('road').agg(agg_functions).reset_index()
 
@@ -41,7 +41,7 @@ def road_grouping(road_dataframe):
         'startnode': ', '.join,
         'sluttnode': ', '.join
     }
-    road_dataframe['road'] = road_dataframe['vref'].apply(lambda x: x.split("D")[0])
+    road_dataframe['road'] = road_dataframe['vref'].apply(lambda x: x.split(" m")[0])
     road_dataframe['startnode'] = road_dataframe['startnode'].apply(lambda x: str(x))
     road_dataframe['sluttnode'] = road_dataframe['sluttnode'].apply(lambda x: str(x))
     road_dataframe = road_dataframe[['road','startnode','sluttnode','geometry']].groupby('road').agg(agg_functions).reset_index()
@@ -83,7 +83,7 @@ def create_adjacency_list(road_dataframe):
     return adjacency_list
 
 def pop_function(x):
-    return math.log10(x)**3.5 #math.sqrt(x)/5
+    return math.sqrt(x)/5
 
 def create_color_map(G, colors):
     color_map = []
@@ -184,7 +184,8 @@ def main():
 
     """adjacents = create_adjacency_list(road_gdf)
     with open('adjacencyDict.txt', 'w') as fp:
-        json.dump(adjacents, fp)"""
+        json.dump(adjacents, fp)
+    print("Created adjancency dict")"""
     with open('adjacencyDict.txt', 'r') as fp:
         adjacents = json.load(fp)
 

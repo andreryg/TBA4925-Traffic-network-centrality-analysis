@@ -26,11 +26,10 @@ def main():
 
         """print("creating adjancency list")
         path = f"city_data/adjacencyDict_{row.tettstednavn.replace('/','&')}.txt"
-        print(path)
-        if row.tettstednavn != "Oslo" and row.tettstednavn != "Bergen":
-            adjacents = create_adjacency_list(road_gdf)
-            with open(f"city_data/adjacencyDict_{row.tettstednavn.replace('/','&')}.txt", 'w') as fp:
-                json.dump(adjacents, fp)"""
+        print(path)"""
+        """adjacents = create_adjacency_list(road_gdf)
+        with open(f"city_data/adjacencyDict_{row.tettstednavn.replace('/','&')}.txt", 'w') as fp:
+            json.dump(adjacents, fp)"""
         with open(f"city_data/adjacencyDict_{row.tettstednavn.replace('/','&')}.txt", 'r') as fp:
             adjacents = json.load(fp)
 
@@ -51,13 +50,13 @@ def main():
 
         print(row.tettstednavn.replace('/','&'))
 
-        G = G.subgraph([x for x,y in G.nodes(data=True) if "x" not in x])
+        """G = G.subgraph([x for x,y in G.nodes(data=True) if "x" not in x])
         colors = ['#377eb8', '#feb24c', '#e41a1c']
         color_map, color_dict, labels = create_color_map(G, colors)
 
         road_gdf['color'] = road_gdf.road.map(color_dict)
         road_gdf.plot(color=road_gdf['color'])
-        plt.show()
+        plt.show()"""
 
 
 
