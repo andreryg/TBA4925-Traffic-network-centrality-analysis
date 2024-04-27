@@ -1,30 +1,31 @@
+from city_based_real_time_traffic import traffic_aggregate
 import pandas as pd
-import numpy as np
 import json
 import tqdm
 import matplotlib.pyplot as plt
-
-def traffic_aggregate(df):
-    agg_functions = {
-        'Trafikkmengde': lambda x: [float(i) for i in x],
-    }
-    df['road'] = df['Vegreferanse'].apply(lambda x: x.split(" m")[0])
-    df = df[['road', 'Dato', 'Trafikkmengde']].groupby(['road','Dato']).agg(agg_functions).reset_index()
-    df['trafikk'] = df['Trafikkmengde'].apply(lambda x: sum(x)/len(x))
-
-    return df
+import numpy as np
 
 def main():
-    city = "Lillehammer"
-    traffic_df = pd.read_csv(f"city_data/real_time/{city}_day.csv", encoding='ANSI',sep=';')
+    df1 = pd.read_csv("daily_traffic_1.csv", encoding='ANSI',sep=';')
+    df2 = pd.read_csv("daily_traffic_2.csv", encoding='ANSI',sep=';')
+    df3 = pd.read_csv("daily_traffic_3.csv", encoding='ANSI',sep=';')
+    df4 = pd.read_csv("daily_traffic_4.csv", encoding='ANSI',sep=';')
+    df5 = pd.read_csv("daily_traffic_5.csv", encoding='ANSI',sep=';')
+    df6 = pd.read_csv("daily_traffic_6.csv", encoding='ANSI',sep=';')
+    df7 = pd.read_csv("daily_traffic_7.csv", encoding='ANSI',sep=';')
+    df8 = pd.read_csv("daily_traffic_8.csv", encoding='ANSI',sep=';')
+    dfs = [df1, df2, df3, df4, df5, df6, df7, df8]
+
+    traffic_df = pd.concat(dfs)
     traffic_df = traffic_df.dropna(subset=['Trafikkmengde'])
     traffic_df = traffic_df[traffic_df['Trafikkmengde'] != "-"]
     traffic_df = traffic_df[traffic_df['Felt'] == "Totalt"]
     traffic_df_agg = traffic_aggregate(traffic_df)
+    print(traffic_df_agg.shape)
 
-    with open(f"city_data/centralityDict_{city}.txt", 'r') as fp:
+    with open(f"centralityDict.txt", 'r') as fp:
             bc = json.load(fp)
-    
+
     bc_list = [(key, value) for key, value in bc.items()]
     bc_df =  pd.DataFrame(bc_list, columns=['road', 'bc'])
 
@@ -41,7 +42,7 @@ def main():
         traffic.append(sum(daily_traffic_df['trafikk'].values.tolist())/len(daily_traffic_df['trafikk'].values.tolist()))
 
     plt.subplot(2,1,1)
-    for counter in counters:
+    for counter in tqdm.tqdm(counters):
         counter_list = [] 
         counter_df = traffic_df[traffic_df['Trafikkregistreringspunkt'] == counter]
         counter_dates = counter_df['Dato'].unique()
@@ -57,7 +58,6 @@ def main():
     plt.subplot(2,1,2)
     plt.plot(correlations)
     plt.show()
-    
 
 if __name__ == "__main__":
     main()

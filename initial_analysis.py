@@ -5,7 +5,7 @@ from shapely.ops import linemerge
 import matplotlib.pyplot as plt
 import math
 from graph import CityNode, TransportNode
-import pickle
+import contextily as cx
 import json
 import networkx as nx
 from tqdm import tqdm
@@ -132,6 +132,7 @@ def create_color_map(G, colors):
 
 def calculate_centrality(G):
     bc = nx.betweenness_centrality(G, weight='weight')
+    print(bc)
     nx.set_node_attributes(G, bc, "cent_betweenness")
     return G, bc
 
@@ -224,9 +225,17 @@ def main():
     ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
     plt.show()"""
 
+    print(road_d_gdf.shape)
+
     #road_d_gdf['color'] = color_map
+    fig = plt.figure()
+    img = fig.add_subplot()
     road_d_gdf['color'] = road_d_gdf.road.map(color_dict)
-    road_d_gdf.plot(color=road_d_gdf['color'])
+    for i,dff in road_d_gdf.groupby('color'):
+        dff.plot(ax=img, alpha=0.9, edgecolor='k', color=dff['color'].values.tolist(), linewidth=1, label=labels.get(i))
+    #road_d_gdf.plot(ax=img, color=road_d_gdf['color'])
+    cx.add_basemap(img, crs=road_d_gdf.crs, source=cx.providers.CartoDB.Voyager)
+    img.legend(loc='upper left')
     plt.show()
 
     

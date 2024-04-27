@@ -6,6 +6,13 @@ import pandas as pd
 import json
 import networkx as nx
 import matplotlib.pyplot as plt
+import contextily as cx
+
+def read_centrality(file_name, G):
+    with open(file_name, 'r') as fp:
+        bc = json.load(fp)
+    nx.set_node_attributes(G, bc, "cent_betweenness")
+    return G, bc
 
 def main():
     tettsteder = read_csv_to_dataframe("alle_tettsteder.csv")
@@ -42,21 +49,31 @@ def main():
             G.edges[pair[0],pair[1]]["weight"] = round((1/(road_gdf[road_gdf['road'] == pair[1]]['time']))*100).values
         G.remove_edges_from(nx.selfloop_edges(G))
 
-        print("calculating centrality...")
+        """print("calculating centrality...")
         G, bc = calculate_centrality(G)
         print("done")
         with open(f"city_data/centralityDict_{row.tettstednavn.replace('/','&')}.txt", 'w') as fp:
-            json.dump(bc, fp)
+            json.dump(bc, fp)"""
+        G, bc = read_centrality(f"city_data/centralityDict_{row.tettstednavn.replace('/','&')}.txt", G)
 
         print(row.tettstednavn.replace('/','&'))
 
-        """G = G.subgraph([x for x,y in G.nodes(data=True) if "x" not in x])
+        G = G.subgraph([x for x,y in G.nodes(data=True) if "x" not in x])
         colors = ['#377eb8', '#feb24c', '#e41a1c']
         color_map, color_dict, labels = create_color_map(G, colors)
 
-        road_gdf['color'] = road_gdf.road.map(color_dict)
+        """road_gdf['color'] = road_gdf.road.map(color_dict)
         road_gdf.plot(color=road_gdf['color'])
         plt.show()"""
+        fig = plt.figure()
+        img = fig.add_subplot()
+        road_gdf['color'] = road_gdf.road.map(color_dict)
+        for i,dff in road_gdf.groupby('color'):
+            dff.plot(ax=img, alpha=0.9, edgecolor='k', color=dff['color'].values.tolist(), linewidth=1, label=labels.get(i))
+        #road_d_gdf.plot(ax=img, color=road_d_gdf['color'])
+        cx.add_basemap(img, crs=road_gdf.crs, source=cx.providers.CartoDB.Voyager)
+        img.legend(loc='upper left')
+        plt.show()
 
 
 
